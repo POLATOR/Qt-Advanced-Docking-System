@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 #if QT_VERSION >= 0x050600
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+#else
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 #endif
 	std::shared_ptr<int> b;
 	QApplication a(argc, argv);

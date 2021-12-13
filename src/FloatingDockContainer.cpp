@@ -597,11 +597,11 @@ void FloatingDockContainerPrivate::handleEscapeKey()
 
 //============================================================================
 CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
-	tFloatingWidgetBase(DockManager),
+	Window(DockManager),
 	d(new FloatingDockContainerPrivate(this))
 {
 	d->DockManager = DockManager;
-	d->DockContainer = new CDockContainerWidget(DockManager, this);
+	d->DockContainer = new CDockContainerWidget(DockManager, centralWidget());
 	connect(d->DockContainer, SIGNAL(dockAreasAdded()), this,
 	    SLOT(onDockAreasAddedOrRemoved()));
 	connect(d->DockContainer, SIGNAL(dockAreasRemoved()), this,
@@ -656,12 +656,12 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 				this, &CFloatingDockContainer::onMaximizeRequest);
 	}
 #else
-	setWindowFlags(
-	    Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+/*	setWindowFlags(
+	    Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);*/
 	QBoxLayout *l = new QBoxLayout(QBoxLayout::TopToBottom);
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
-	setLayout(l);
+	centralWidget()->setLayout(l);
 	l->addWidget(d->DockContainer);
 #endif
 
@@ -794,6 +794,33 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 	return false;
 }
 #endif
+
+void CFloatingDockContainer::onStartMoving()
+{
+	if (d->isState(DraggingInactive))
+	{
+		d->setState(DraggingFloatingWidget);
+		d->updateDropOverlays(QCursor::pos());
+	}
+}
+
+void CFloatingDockContainer::onMoving()
+{
+	if (d->isState(DraggingFloatingWidget))
+	{
+		d->updateDropOverlays(QCursor::pos());
+	}
+}
+
+void CFloatingDockContainer::onEndMoving()
+{
+	if (d->isState(DraggingFloatingWidget))
+	{
+		ADS_PRINT("CFloatingDockContainer::nativeEvent WM_EXITSIZEMOVE");
+		d->titleMouseReleaseEvent();
+	}
+}
+
 
 
 //============================================================================

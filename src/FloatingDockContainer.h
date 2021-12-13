@@ -41,6 +41,8 @@
 #define tFloatingWidgetBase QWidget
 #endif
 
+#include "Window/Window.h"
+
 class CDockingStateReader;
 
 namespace ads
@@ -101,7 +103,7 @@ public:
  * another dock container.
  * Every floating window of the docking system is a FloatingDockContainer.
  */
-class ADS_EXPORT CFloatingDockContainer : public tFloatingWidgetBase, public IFloatingWidget
+class ADS_EXPORT CFloatingDockContainer : public Window, public IFloatingWidget
 {
 	Q_OBJECT
 private:
@@ -200,6 +202,12 @@ protected: // reimplements QWidget
     virtual bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
 #endif
 #endif
+
+	void onStartMoving() override;
+
+	void onMoving() override;
+
+	void onEndMoving()override;
 
 
 public:

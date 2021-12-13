@@ -28,6 +28,16 @@ set(ads_SRCS
     IconProvider.cpp
     DockComponentsFactory.cpp
     ads.qrc
+
+    Window/Window.cpp
+    Window/Data/Common.cpp
+    Window/Data/Resizer.cpp
+    Window/Data/TripleShadowPart.cpp
+    Window/Data/TripleShadow.cpp
+    Window/Data/WindowBackground.cpp
+    Window/Data/WindowCentralWidget.cpp
+    Window/Data/WindowData.cpp
+    Window/Data/WindowHeader.cpp
 )
 set(ads_HEADERS
     ads_globals.h
@@ -48,6 +58,16 @@ set(ads_HEADERS
     FloatingDragPreview.h
     IconProvider.h
     DockComponentsFactory.h
+
+    Window/Window.h
+    Window/Data/Common.h
+    Window/Data/Resizer.h
+    Window/Data/TripleShadow.h
+    Window/Data/TripleShadowPart.h
+    Window/Data/WindowBackground.h
+    Window/Data/WindowCentralWidget.h
+    Window/Data/WindowData.h
+    Window/Data/WindowHeader.h
 )
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 if (UNIX AND NOT APPLE)
