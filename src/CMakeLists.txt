@@ -38,6 +38,16 @@ set(ads_SRCS
     Window/Data/WindowCentralWidget.cpp
     Window/Data/WindowData.cpp
     Window/Data/WindowHeader.cpp
+
+    Window/Window.h
+    Window/Data/Common.h
+    Window/Data/Resizer.h
+    Window/Data/TripleShadow.h
+    Window/Data/TripleShadowPart.h
+    Window/Data/WindowBackground.h
+    Window/Data/WindowCentralWidget.h
+    Window/Data/WindowData.h
+    Window/Data/WindowHeader.h
 )
 set(ads_HEADERS
     ads_globals.h
@@ -58,16 +68,6 @@ set(ads_HEADERS
     FloatingDragPreview.h
     IconProvider.h
     DockComponentsFactory.h
-
-    Window/Window.h
-    Window/Data/Common.h
-    Window/Data/Resizer.h
-    Window/Data/TripleShadow.h
-    Window/Data/TripleShadowPart.h
-    Window/Data/WindowBackground.h
-    Window/Data/WindowCentralWidget.h
-    Window/Data/WindowData.h
-    Window/Data/WindowHeader.h
 )
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 if (UNIX AND NOT APPLE)
@@ -103,9 +103,11 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 install(FILES ${ads_HEADERS}
-    DESTINATION include
+    DESTINATION include/PolatorADS
     COMPONENT headers
 )
+install(DIRECTORY Window DESTINATION include/PolatorADS FILES_MATCHING PATTERN "Window.h")
+
 install(FILES
     "${CMAKE_SOURCE_DIR}/LICENSE"
     "${CMAKE_SOURCE_DIR}/gnu-lgpl-v2.1.md"
@@ -117,7 +119,7 @@ install(TARGETS qtadvanceddocking
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include
+    INCLUDES DESTINATION include/PolatorADS
 )
 
 install(EXPORT adsTargets
@@ -130,6 +132,6 @@ install(FILES qtadvanceddockingConfig.cmake "${CMAKE_CURRENT_BINARY_DIR}/qtadvan
 )
 
 target_include_directories(qtadvanceddocking PUBLIC
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:include/PolatorADS>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
