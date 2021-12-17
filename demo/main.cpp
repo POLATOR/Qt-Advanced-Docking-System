@@ -6,10 +6,11 @@
 
 #include <memory>
 
+#include <Windows.h>
 
-
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void myMessageOutput(QtMsgType type, const QMessageLogContext & context, const QString & msg)
 {
+    OutputDebugStringW((msg + "\n").toStdWString().c_str());
     QByteArray localMsg = msg.toLocal8Bit();
     switch (type) {
     case QtDebugMsg:
@@ -33,31 +34,31 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     fflush(stdout);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-	QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= 0x050600
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 #else
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 #endif
-	std::shared_ptr<int> b;
-	QApplication a(argc, argv);
-	a.setApplicationName("Advanced Docking System Demo");
-	a.setQuitOnLastWindowClosed(true);
+    std::shared_ptr<int> b;
+    QApplication a(argc, argv);
+    a.setApplicationName("Advanced Docking System Demo");
+    a.setQuitOnLastWindowClosed(true);
 
-	QFile StyleSheetFile(":/adsdemo/app.css");
-	StyleSheetFile.open(QIODevice::ReadOnly);
-	QTextStream StyleSheetStream(&StyleSheetFile);
-	a.setStyleSheet(StyleSheetStream.readAll());
-	StyleSheetFile.close();
+    QFile StyleSheetFile(":/adsdemo/app.css");
+    StyleSheetFile.open(QIODevice::ReadOnly);
+    QTextStream StyleSheetStream(&StyleSheetFile);
+    a.setStyleSheet(StyleSheetStream.readAll());
+    StyleSheetFile.close();
 
-	qInstallMessageHandler(myMessageOutput);
-	qDebug() << "Message handler test";
+    qInstallMessageHandler(myMessageOutput);
+    qDebug() << "Message handler test";
 
-	CMainWindow mw;
-	mw.show();
-	return a.exec();
+    CMainWindow mw;
+    mw.show();
+    return a.exec();
 }

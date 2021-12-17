@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 
 #include "Window/Data/Resizer.h"
+#include "Window/Data/SizeRubberBand.h"
 #include "Window/Data/TripleShadow.h"
 #include "Window/Data/WindowBackground.h"
 #include "Window/Data/WindowHeader.h"
@@ -45,15 +46,16 @@ WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
 
     m_background = new WindowBackground(this, buttons);
 
-    m_resizers.push_back(new NWResizer(m_sizingWindow));
-    m_resizers.push_back(new NEResizer(m_sizingWindow));
-    m_resizers.push_back(new SWResizer(m_sizingWindow));
-    m_resizers.push_back(new SEResizer(m_sizingWindow));
-    m_resizers.push_back(new NResizer(m_sizingWindow));
-    m_resizers.push_back(new SResizer(m_sizingWindow));
-    m_resizers.push_back(new WResizer(m_sizingWindow));
-    m_resizers.push_back(new EResizer(m_sizingWindow));
-    initResizerFlags();
+    m_sizeRubberBand = new SizeRubberBand(m_sizingWindow);
+
+    m_resizers.push_back(new NWResizer(m_sizeRubberBand));
+    m_resizers.push_back(new NEResizer(m_sizeRubberBand));
+    m_resizers.push_back(new SWResizer(m_sizeRubberBand));
+    m_resizers.push_back(new SEResizer(m_sizeRubberBand));
+    m_resizers.push_back(new NResizer(m_sizeRubberBand));
+    m_resizers.push_back(new SResizer(m_sizeRubberBand));
+    m_resizers.push_back(new WResizer(m_sizeRubberBand));
+    m_resizers.push_back(new EResizer(m_sizeRubberBand));
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_background);
@@ -62,6 +64,7 @@ WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
 
     m_shadow = new TripleShadow(m_sizingWindow->parentWidget());
     m_shadow->setGeometry({MapToData(m_sizingWindow->pos()), MapToData(m_sizingWindow->size())});
+    m_shadow->stackUnder(m_sizingWindow);
 
     m_sizingWindow->installEventFilter(this);
     m_sizingWindow->raise();
@@ -70,12 +73,17 @@ WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
 WindowData::~WindowData()
 {
     delete m_shadow;
+    delete m_sizeRubberBand;
 }
 
-void WindowData::setDrawShadowOnResize(bool drawShadowOnResize)
+bool WindowData::rubberOnResize() const
 {
-    m_drawShadowOnResize = drawShadowOnResize;
-    initResizerFlags();
+    return m_sizeRubberBand->isRubberResize();
+}
+
+void WindowData::setRubberOnResize(bool rubberOnResize)
+{
+    m_sizeRubberBand->setRubberResize(rubberOnResize);
 }
 
 void WindowData::setGripSize(int gripSize)
@@ -172,22 +180,6 @@ void WindowData::showShadow()
     if (m_shadow->shadowStyle() != ShadowStyle::None) {
         m_shadow->show();
         m_sizingWindow->raise();
-    }
-}
-
-void WindowData::initResizerFlags()
-{
-    if (m_drawShadowOnResize) {
-        for (auto resizer: m_resizers) {
-            disconnect(resizer, &Resizer::beginResize, this, &WindowData::hideShadow);
-            disconnect(resizer, &Resizer::endResize, this, &WindowData::showShadow);
-        }
-    }
-    else {
-        for (auto resizer: m_resizers) {
-            connect(resizer, &Resizer::beginResize, this, &WindowData::hideShadow);
-            connect(resizer, &Resizer::endResize, this, &WindowData::showShadow);
-        }
     }
 }
 

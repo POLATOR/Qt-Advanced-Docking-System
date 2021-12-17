@@ -32,6 +32,7 @@ set(ads_SRCS
     Window/Window.cpp
     Window/Data/Common.cpp
     Window/Data/Resizer.cpp
+    Window/Data/SizeRubberBand.cpp
     Window/Data/TripleShadowPart.cpp
     Window/Data/TripleShadow.cpp
     Window/Data/WindowBackground.cpp
@@ -42,6 +43,7 @@ set(ads_SRCS
     Window/Window.h
     Window/Data/Common.h
     Window/Data/Resizer.h
+    Window/Data/SizeRubberBand.h
     Window/Data/TripleShadow.h
     Window/Data/TripleShadowPart.h
     Window/Data/WindowBackground.h

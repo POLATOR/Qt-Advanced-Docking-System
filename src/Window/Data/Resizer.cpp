@@ -3,6 +3,8 @@
 #include <QLayout>
 #include <QMouseEvent>
 
+#include "Window/Data/SizeRubberBand.h"
+
 namespace ads {
 
 namespace {
@@ -19,9 +21,9 @@ int AdjustValue(int value, int minValue, int maxValue)
 
 } // namespace
 
-Resizer::Resizer(Qt::CursorShape cursorShape, QWidget * sizingWindow)
-    : QWidget(sizingWindow)
-    , m_sizingWindow(sizingWindow)
+Resizer::Resizer(Qt::CursorShape cursorShape, SizeRubberBand * sizeRubberBand)
+    : QWidget(sizeRubberBand->sizingWindow())
+    , m_sizeRubberBand(sizeRubberBand)
 {
     setCursor(cursorShape);
     setMouseTracking(true);
@@ -43,26 +45,11 @@ int Resizer::adjustWidth(int width) const
 
 void Resizer::mouseMoveEvent(QMouseEvent * event)
 {
-    if (event->buttons() == Qt::LeftButton && m_resizeMode) {
+    if (event->buttons() == Qt::LeftButton && m_sizeRubberBand->isResized()) {
         auto pos = event->globalPosition().toPoint();
-        auto & oldGeometry = m_sizingWindow->geometry();
+        auto oldGeometry = m_sizeRubberBand->oldGeometry();
         auto newGeometry = calcNewSize(oldGeometry, pos);
-        auto deltaPos = newGeometry.topLeft() - oldGeometry.topLeft();
-        auto deltaSize = newGeometry.size() - oldGeometry.size();
-        if (!deltaPos.isNull() || !deltaSize.isNull()) {
-            Q_EMIT beforeNewGeometry(deltaPos, deltaSize);
-        }
-        if (!deltaPos.isNull() && !deltaSize.isNull()) {
-            // m_sizingWindow->setGeometry({m_sizingWindow->pos() + deltaPos, m_sizingWindow->size() + deltaSize});
-            m_sizingWindow->move(m_sizingWindow->pos() + deltaPos);
-            m_sizingWindow->resize(m_sizingWindow->size() + deltaSize);
-        }
-        else if (!deltaPos.isNull()) {
-            m_sizingWindow->move(m_sizingWindow->pos() + deltaPos);
-        }
-        else if (!deltaSize.isNull()) {
-            m_sizingWindow->resize(m_sizingWindow->size() + deltaSize);
-        }
+        m_sizeRubberBand->updateGeometry(newGeometry);
     }
     QWidget::mouseMoveEvent(event);
 }
@@ -70,32 +57,23 @@ void Resizer::mouseMoveEvent(QMouseEvent * event)
 void Resizer::mousePressEvent(QMouseEvent * event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_resizeMode = true;
-        Q_EMIT beginResize();
+        m_sizeRubberBand->start();
     }
     QWidget::mousePressEvent(event);
 }
 
 void Resizer::mouseReleaseEvent(QMouseEvent * event)
 {
-    if (m_resizeMode) {
-        m_resizeMode = false;
-        Q_EMIT endResize();
+    if (m_sizeRubberBand->isResized()) {
+        m_sizeRubberBand->stop();
     }
     QWidget::mouseReleaseEvent(event);
 }
 
 void Resizer::sizes(QSize & minSize, QSize & maxSize) const
 {
-    auto layout = m_sizingWindow->layout();
-    minSize = m_sizingWindow->minimumSize();
-    if (minSize.isNull() && layout) {
-        minSize = layout->minimumSize();
-    }
-    maxSize = m_sizingWindow->maximumSize();
-    if (maxSize == QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX) && layout) {
-        maxSize = layout->maximumSize();
-    }
+    minSize = m_sizeRubberBand->layoutMinimumSize();
+    maxSize = m_sizeRubberBand->layoutMaximumSize();
 }
 
 void NResizer::updateGeometry(const QRect & geometry, int gripSize)

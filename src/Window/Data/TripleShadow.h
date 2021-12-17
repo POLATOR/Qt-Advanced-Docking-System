@@ -18,7 +18,7 @@ public:
 
     TripleShadow(QWidget * parent);
 
-    void prepareNewGeometry(const QPoint & deltaPos, const QSize & deltaSize);
+    void geometryAboutToChange(const QPoint & deltaPos, const QSize & deltaSize);
 
     QColor shadowColor() const noexcept
     {

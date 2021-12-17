@@ -9,13 +9,14 @@
 namespace ads {
 
 class Resizer;
+class SizeRubberBand;
 class TripleShadow;
 class WindowBackground;
 
 class WindowData : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(bool drawShadowOnResize READ drawShadowOnResize WRITE setDrawShadowOnResize)
+    Q_PROPERTY(bool rubberOnResize READ rubberOnResize WRITE setRubberOnResize)
     Q_PROPERTY(QColor shadowColor READ shadowColor WRITE setShadowColor)
     Q_PROPERTY(ShadowStyle shadowStyle READ shadowStyle WRITE setShadowStyle)
     Q_PROPERTY(int gripSize READ gripSize WRITE setGripSize)
@@ -31,11 +32,8 @@ public:
         return m_background;
     }
 
-    bool drawShadowOnResize() const noexcept
-    {
-        return m_drawShadowOnResize;
-    }
-    void setDrawShadowOnResize(bool drawShadowOnResize);
+    bool rubberOnResize() const;
+    void setRubberOnResize(bool rubberOnResize);
 
     int gripSize() const noexcept
     {
@@ -68,10 +66,8 @@ private:
     TripleShadow * m_shadow = nullptr;
     WindowBackground * m_background = nullptr;
     QVector<Resizer *> m_resizers;
-    bool m_drawShadowOnResize = true;
+    SizeRubberBand * m_sizeRubberBand = nullptr;
     int m_gripSize = DEFAULT_GRIP_SIZE;
-
-    void initResizerFlags();
 
     void updateResizers();
 };

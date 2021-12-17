@@ -4,20 +4,15 @@
 
 namespace ads {
 
+class SizeRubberBand;
+
 class Resizer : public QWidget
 {
     Q_OBJECT
 public:
-    Resizer(Qt::CursorShape cursorShape, QWidget * sizingWindow);
+    Resizer(Qt::CursorShape cursorShape, SizeRubberBand * sizeRubberBand);
 
     virtual void updateGeometry(const QRect & geometry, int gripSize) = 0;
-
-Q_SIGNALS:
-    void beforeNewGeometry(const QPoint & deltaPos, const QSize & deltaSize);
-
-    void beginResize();
-
-    void endResize();
 
 protected:
     int adjustHeight(int height) const;
@@ -33,8 +28,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent * event) override;
 
 private:
-    bool m_resizeMode = false;
-    QWidget * m_sizingWindow = nullptr;
+    SizeRubberBand * m_sizeRubberBand = nullptr;
 
     void sizes(QSize & minSize, QSize & maxSize) const;
 };
@@ -42,8 +36,8 @@ private:
 class NResizer : public Resizer
 {
 public:
-    NResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeVerCursor, sizingWindow)
+    NResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeVerCursor, sizeRubberBand)
     {
     }
 
@@ -56,8 +50,8 @@ protected:
 class SResizer : public Resizer
 {
 public:
-    SResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeVerCursor, sizingWindow)
+    SResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeVerCursor, sizeRubberBand)
     {
     }
 
@@ -70,8 +64,8 @@ protected:
 class WResizer : public Resizer
 {
 public:
-    WResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeHorCursor, sizingWindow)
+    WResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeHorCursor, sizeRubberBand)
     {
     }
 
@@ -84,8 +78,8 @@ protected:
 class EResizer : public Resizer
 {
 public:
-    EResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeHorCursor, sizingWindow)
+    EResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeHorCursor, sizeRubberBand)
     {
     }
 
@@ -98,8 +92,8 @@ protected:
 class NWResizer : public Resizer
 {
 public:
-    NWResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeFDiagCursor, sizingWindow)
+    NWResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeFDiagCursor, sizeRubberBand)
     {
     }
 
@@ -112,8 +106,8 @@ protected:
 class NEResizer : public Resizer
 {
 public:
-    NEResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeBDiagCursor, sizingWindow)
+    NEResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeBDiagCursor, sizeRubberBand)
     {
     }
 
@@ -126,8 +120,8 @@ protected:
 class SWResizer : public Resizer
 {
 public:
-    SWResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeBDiagCursor, sizingWindow)
+    SWResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeBDiagCursor, sizeRubberBand)
     {
     }
 
@@ -140,8 +134,8 @@ protected:
 class SEResizer : public Resizer
 {
 public:
-    SEResizer(QWidget * sizingWindow)
-        : Resizer(Qt::SizeFDiagCursor, sizingWindow)
+    SEResizer(SizeRubberBand * sizeRubberBand)
+        : Resizer(Qt::SizeFDiagCursor, sizeRubberBand)
     {
     }
 

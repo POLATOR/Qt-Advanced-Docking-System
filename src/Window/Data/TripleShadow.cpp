@@ -47,33 +47,6 @@ TripleShadow::TripleShadow(QWidget * parent)
     setVisible(false);
 }
 
-void TripleShadow::prepareNewGeometry(const QPoint & deltaPos, const QSize & deltaSize)
-{
-    auto & g = geometry();
-    auto newPos = g.topLeft();
-    auto newSize = g.size();
-
-    if (deltaPos.x() < 0 || deltaPos.y() < 0) {
-        newPos += deltaPos;
-    }
-
-    if (deltaSize.width() < 0 || deltaSize.height() < 0) {
-        newSize += deltaSize;
-    }
-
-    if (g.topLeft() != newPos && g.size() != newSize) {
-        resizeParts(newSize);
-        setGeometry({newPos, newSize});
-    }
-    else if (g.topLeft() != newPos) {
-        move(newPos);
-    }
-    else if (g.size() != newSize) {
-        resizeParts(newSize);
-        resize(newSize);
-    }
-}
-
 void TripleShadow::setShadowColor(const QColor & shadowColor)
 {
     SetEffectColor(m_leftPart, shadowColor);
