@@ -18,16 +18,6 @@ namespace ads {
 
 namespace {
 
-QPoint MapToData(const QPoint & pos)
-{
-    return pos - TripleShadow::SHADOW_MARGIN_OFFSET;
-}
-
-QSize MapToData(const QSize & size)
-{
-    return size + TripleShadow::SHADOW_MARGIN_SIZE;
-}
-
 } // namespace
 
 const int WindowData::DEFAULT_GRIP_SIZE = 8;
@@ -46,7 +36,11 @@ WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
 
     m_background = new WindowBackground(this, buttons);
 
-    m_sizeRubberBand = new SizeRubberBand(m_sizingWindow);
+    m_shadow = new TripleShadow(m_sizingWindow->parentWidget());
+    m_shadow->setGeometry({TripleShadow::mapToShadow(m_sizingWindow->pos()), TripleShadow::mapToShadow(m_sizingWindow->size())});
+    m_shadow->stackUnder(m_sizingWindow);
+
+    m_sizeRubberBand = new SizeRubberBand(m_sizingWindow, m_shadow);
 
     m_resizers.push_back(new NWResizer(m_sizeRubberBand));
     m_resizers.push_back(new NEResizer(m_sizeRubberBand));
@@ -61,10 +55,6 @@ WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
     mainLayout->addWidget(m_background);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     m_sizingWindow->setLayout(mainLayout);
-
-    m_shadow = new TripleShadow(m_sizingWindow->parentWidget());
-    m_shadow->setGeometry({MapToData(m_sizingWindow->pos()), MapToData(m_sizingWindow->size())});
-    m_shadow->stackUnder(m_sizingWindow);
 
     m_sizingWindow->installEventFilter(this);
     m_sizingWindow->raise();
@@ -181,15 +171,16 @@ bool WindowData::eventFilter(QObject * watched, QEvent * event)
     if (watched == m_sizingWindow) {
         switch (event->type()) {
         case QEvent::Resize:
-            m_shadow->resize(MapToData(m_sizingWindow->size()));
+            m_shadow->resize(TripleShadow::mapToShadow(m_sizingWindow->size()));
             updateResizers();
             break;
         case QEvent::Move:
-            m_shadow->move(MapToData(static_cast<QMoveEvent *>(event)->pos()));
+            m_shadow->move(TripleShadow::mapToShadow(static_cast<QMoveEvent *>(event)->pos()));
             break;
         case QEvent::Show:
             if (m_shadow->shadowStyle() != ShadowStyle::None) {
                 m_shadow->show();
+                m_shadow->stackUnder(m_sizingWindow);
             }
             break;
         case QEvent::Hide:

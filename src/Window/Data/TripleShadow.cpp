@@ -25,11 +25,22 @@ void SetEffectColor(QWidget * widget, const QColor & shadowColor)
     }
 }
 
+const int SHADOW_MARGIN = 96;
+const QSize SHADOW_MARGIN_SIZE{SHADOW_MARGIN * 2, SHADOW_MARGIN * 2};
+
 } // namespace
 
-const int TripleShadow::SHADOW_MARGIN = 96;
 const QPoint TripleShadow::SHADOW_MARGIN_OFFSET{SHADOW_MARGIN, SHADOW_MARGIN};
-const QSize TripleShadow::SHADOW_MARGIN_SIZE{SHADOW_MARGIN * 2, SHADOW_MARGIN * 2};
+
+QPoint TripleShadow::mapToShadow(const QPoint & pos)
+{
+    return pos - SHADOW_MARGIN_OFFSET;
+}
+
+QSize TripleShadow::mapToShadow(const QSize & size)
+{
+    return size + SHADOW_MARGIN_SIZE;
+}
 
 TripleShadow::TripleShadow(QWidget * parent)
     : QWidget(parent, Qt::Window)

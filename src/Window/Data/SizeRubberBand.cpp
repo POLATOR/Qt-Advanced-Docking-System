@@ -1,14 +1,21 @@
 #include "Window/Data/SizeRubberBand.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QLayout>
 #include <QPainter>
+#include <QTimer>
+
+#include "Window/Data/TripleShadow.h"
 
 namespace ads {
 
-SizeRubberBand::SizeRubberBand(QWidget * sizingWindow)
+const int NO_MORE_MS = 50;
+
+SizeRubberBand::SizeRubberBand(QWidget * sizingWindow, QWidget * shadow)
     : QWidget(nullptr, Qt::Window)
     , m_sizingWindow(sizingWindow)
+    , m_shadow(shadow)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -67,30 +74,18 @@ void SizeRubberBand::stop()
 {
     if (isRubberResize()) {
         hide();
-        m_sizingWindow->setGeometry(geometry());
+        resizeWidget(m_sizingWindow, geometry());
     }
     m_resizeStarted = false;
 }
 
 void SizeRubberBand::updateGeometry(const QRect & newGeometry)
 {
-    QWidget * widgetToResize = isRubberResize() ? this : m_sizingWindow;
-
-    auto & oldGeometry = widgetToResize->geometry();
-    auto deltaPos = newGeometry.topLeft() - oldGeometry.topLeft();
-    auto deltaSize = newGeometry.size() - oldGeometry.size();
-    auto positivePos = (deltaPos.x() > 0 || deltaPos.y() > 0);
-    auto negativeSize = (deltaSize.width() < 0 || deltaSize.height() < 0);
-    auto sizeBefore = (positivePos || negativeSize);
-
-    if (sizeBefore && !deltaSize.isNull()) {
-        widgetToResize->resize(newGeometry.size());
+    if (isRubberResize()) {
+        setGeometry(newGeometry);
     }
-    if (!deltaPos.isNull()) {
-        widgetToResize->move(newGeometry.topLeft());
-    }
-    if (!sizeBefore && !deltaSize.isNull()) {
-        widgetToResize->resize(newGeometry.size());
+    else {
+        resizeWidget(m_sizingWindow, newGeometry);
     }
 }
 
@@ -105,6 +100,38 @@ void SizeRubberBand::paintEvent(QPaintEvent * event)
     painter.setPen(pen);
     painter.setBrush(m_backgroundColor);
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), m_borderRadius, m_borderRadius);
+}
+
+void SizeRubberBand::resizeWidget(QWidget * widget, const QRect & newGeometry)
+{
+    auto & oldGeometry = widget->geometry();
+    auto oldPos = oldGeometry.topLeft();
+    auto oldSize = oldGeometry.size();
+    auto deltaPos = newGeometry.topLeft() - oldGeometry.topLeft();
+    auto deltaSize = newGeometry.size() - oldGeometry.size();
+
+    auto beforeSize = newGeometry.size();
+    if (deltaSize.width() > 0) {
+        beforeSize.setWidth(oldSize.width());
+    }
+    if (deltaSize.height() > 0) {
+        beforeSize.setHeight(oldSize.height());
+    }
+    auto middlePos = newGeometry.topLeft();
+    if (deltaPos.x() < 0) {
+        middlePos.setX(oldPos.x());
+    }
+    if (deltaPos.y() < 0) {
+        middlePos.setY(oldPos.y());
+    }
+    if (beforeSize != oldSize) {
+        m_shadow->resize(TripleShadow::mapToShadow(beforeSize));
+        QCoreApplication::processEvents(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents, NO_MORE_MS);
+    }
+    if (middlePos != oldPos) {
+        m_shadow->move(TripleShadow::mapToShadow(middlePos));
+    }
+    widget->setGeometry(newGeometry);
 }
 
 } // namespace ads

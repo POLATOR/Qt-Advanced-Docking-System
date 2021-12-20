@@ -12,13 +12,11 @@ class TripleShadow : public QWidget
 {
     Q_OBJECT
 public:
-    static const int SHADOW_MARGIN;
     static const QPoint SHADOW_MARGIN_OFFSET;
-    static const QSize SHADOW_MARGIN_SIZE;
+    static QPoint mapToShadow(const QPoint & pos);
+    static QSize mapToShadow(const QSize & size);
 
     TripleShadow(QWidget * parent);
-
-    void geometryAboutToChange(const QPoint & deltaPos, const QSize & deltaSize);
 
     QColor shadowColor() const noexcept
     {

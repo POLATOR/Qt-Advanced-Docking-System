@@ -8,7 +8,7 @@ class SizeRubberBand : public QWidget
 {
     Q_OBJECT
 public:
-    SizeRubberBand(QWidget * sizingWindow);
+    SizeRubberBand(QWidget * sizingWindow, QWidget * shadow);
 
     bool isResized() const noexcept
     {
@@ -79,12 +79,15 @@ protected:
 
 private:
     QWidget * m_sizingWindow = nullptr;
+    QWidget * m_shadow = nullptr;
     bool m_resizeStarted = false;
     bool m_rubberResize = false;
     int m_borderRadius = 0;
     int m_borderWidth = 1;
     QColor m_borderColor{0, 120, 215, 255};
     QBrush m_backgroundColor{QColor{0, 25, 153, 25}};
+
+    void resizeWidget(QWidget * widget, const QRect & newGeometry);
 };
 
 } // namespace ads

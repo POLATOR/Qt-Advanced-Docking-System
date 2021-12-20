@@ -78,7 +78,7 @@ void Resizer::sizes(QSize & minSize, QSize & maxSize) const
 
 void NResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.topLeft() + QPoint(gripSize, -gripSize / 2), QSize{geometry.width() - gripSize * 2, gripSize}};
+    QRect g{geometry.topLeft() + QPoint(gripSize, 0), QSize{geometry.width() - gripSize * 2, gripSize}};
     setGeometry(g);
 }
 
@@ -92,7 +92,7 @@ QRect NResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void SResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.bottomLeft() + QPoint(gripSize, -gripSize / 2), QSize{geometry.width() - gripSize * 2, gripSize}};
+    QRect g{geometry.bottomLeft() + QPoint(gripSize, -gripSize), QSize{geometry.width() - gripSize * 2, gripSize}};
     setGeometry(g);
 }
 
@@ -106,7 +106,7 @@ QRect SResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void WResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.topLeft() + QPoint(-gripSize / 2, gripSize), QSize{gripSize, geometry.height() - gripSize * 2}};
+    QRect g{geometry.topLeft() + QPoint(0, gripSize), QSize{gripSize, geometry.height() - gripSize * 2}};
     setGeometry(g);
 }
 
@@ -120,7 +120,7 @@ QRect WResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void EResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.topRight() + QPoint(-gripSize / 2, gripSize), QSize{gripSize, geometry.height() - gripSize * 2}};
+    QRect g{geometry.topRight() + QPoint(-gripSize, gripSize), QSize{gripSize, geometry.height() - gripSize * 2}};
     setGeometry(g);
 }
 
@@ -134,7 +134,7 @@ QRect EResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void NWResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.topLeft() - QPoint(gripSize / 2, gripSize / 2), QSize{(gripSize * 3) / 2, (gripSize * 3) / 2}};
+    QRect g{geometry.topLeft(), QSize{gripSize, gripSize}};
     setGeometry(g);
 }
 
@@ -150,7 +150,7 @@ QRect NWResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void NEResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.topRight() - QPoint(gripSize, gripSize / 2), QSize{(gripSize * 3) / 2, (gripSize * 3) / 2}};
+    QRect g{geometry.topRight() + QPoint(-gripSize, 0), QSize{gripSize, gripSize}};
     setGeometry(g);
 }
 
@@ -166,7 +166,7 @@ QRect NEResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void SWResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.bottomLeft() - QPoint(gripSize / 2, gripSize), QSize{(gripSize * 3) / 2, (gripSize * 3) / 2}};
+    QRect g{geometry.bottomLeft() + QPoint(0, -gripSize), QSize{gripSize, gripSize}};
     setGeometry(g);
 }
 
@@ -182,7 +182,7 @@ QRect SWResizer::calcNewSize(QRect geometry, const QPoint & pos) const
 
 void SEResizer::updateGeometry(const QRect & geometry, int gripSize)
 {
-    QRect g{geometry.bottomRight() - QPoint(gripSize, gripSize), QSize{(gripSize * 3) / 2, (gripSize * 3) / 2}};
+    QRect g{geometry.bottomRight() + QPoint(-gripSize, -gripSize), QSize{gripSize, gripSize}};
     setGeometry(g);
 }
 
