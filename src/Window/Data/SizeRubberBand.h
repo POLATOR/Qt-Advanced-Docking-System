@@ -35,6 +35,39 @@ public:
 
     const QRect & oldGeometry() const;
 
+    int borderRadius() const
+    {
+        return m_borderRadius;
+    }
+    void setBorderRadius(int borderRadius)
+    {
+        m_borderRadius = borderRadius;
+    }
+    int borderWidth() const
+    {
+        return m_borderWidth;
+    }
+    void setBorderWidth(int borderWidth)
+    {
+        m_borderWidth = borderWidth;
+    }
+    QColor borderColor() const
+    {
+        return m_borderColor;
+    }
+    void setBorderColor(const QColor & borderColor)
+    {
+        m_borderColor = borderColor;
+    }
+    QBrush backgroundColor() const
+    {
+        return m_backgroundColor;
+    }
+    void setBackgroundColor(const QBrush & backgroundColor)
+    {
+        m_backgroundColor = backgroundColor;
+    }
+
     void start();
 
     void stop();
@@ -48,6 +81,10 @@ private:
     QWidget * m_sizingWindow = nullptr;
     bool m_resizeStarted = false;
     bool m_rubberResize = false;
+    int m_borderRadius = 0;
+    int m_borderWidth = 1;
+    QColor m_borderColor{0, 120, 215, 255};
+    QBrush m_backgroundColor{QColor{0, 25, 153, 25}};
 };
 
 } // namespace ads

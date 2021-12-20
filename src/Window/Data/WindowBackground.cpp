@@ -15,8 +15,6 @@ namespace ads {
 WindowBackground::WindowBackground(WindowData * windowData, WindowHeaderButtons buttons)
     : QFrame(windowData)
 {
-    setAutoFillBackground(true);
-
     m_header = new WindowHeader(windowData, this);
     m_header->setButtons(buttons);
     m_centralWidget = new WindowCentralWidget(this);

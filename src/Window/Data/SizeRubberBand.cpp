@@ -97,20 +97,14 @@ void SizeRubberBand::updateGeometry(const QRect & newGeometry)
 void SizeRubberBand::paintEvent(QPaintEvent * event)
 {
     QPainter painter(this);
-    QColor Color = palette().color(QPalette::Active, QPalette::Highlight);
-
-    QPen Pen = painter.pen();
-    Pen.setColor(Color.darker(120));
-    Pen.setStyle(Qt::SolidLine);
-    Pen.setWidth(4);
-    Pen.setCosmetic(true);
-    painter.setPen(Pen);
-
-    Color = Color.lighter(130);
-    Color.setAlphaF(0.10);
-    painter.setBrush(Color);
-
-    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 8.0, 8.0);
+    auto pen = painter.pen();
+    pen.setColor(m_borderColor);
+    pen.setStyle(Qt::SolidLine);
+    pen.setWidth(m_borderWidth);
+    pen.setCosmetic(true);
+    painter.setPen(pen);
+    painter.setBrush(m_backgroundColor);
+    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), m_borderRadius, m_borderRadius);
 }
 
 } // namespace ads

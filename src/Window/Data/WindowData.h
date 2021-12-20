@@ -16,10 +16,14 @@ class WindowBackground;
 class WindowData : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(bool rubberOnResize READ rubberOnResize WRITE setRubberOnResize)
     Q_PROPERTY(QColor shadowColor READ shadowColor WRITE setShadowColor)
     Q_PROPERTY(ShadowStyle shadowStyle READ shadowStyle WRITE setShadowStyle)
     Q_PROPERTY(int gripSize READ gripSize WRITE setGripSize)
+    Q_PROPERTY(bool rubberOnResize READ rubberOnResize WRITE setRubberOnResize)
+    Q_PROPERTY(int rubberBorderRadius READ rubberBorderRadius WRITE setRubberBorderRadius)
+    Q_PROPERTY(int rubberBorderWidth READ rubberBorderWidth WRITE setRubberBorderWidth)
+    Q_PROPERTY(QColor rubberBorderColor READ rubberBorderColor WRITE setRubberBorderColor)
+    Q_PROPERTY(QBrush rubberBackgroundColor READ rubberBackgroundColor WRITE setRubberBackgroundColor)
 public:
     static const int DEFAULT_GRIP_SIZE;
 
@@ -43,6 +47,15 @@ public:
 
     bool isResizeEnabled() const;
     void setResizeEnabled(bool enabled);
+
+    int rubberBorderRadius() const;
+    void setRubberBorderRadius(int borderRadius);
+    int rubberBorderWidth() const;
+    void setRubberBorderWidth(int borderWidth);
+    QColor rubberBorderColor() const;
+    void setRubberBorderColor(const QColor & borderColor);
+    QBrush rubberBackgroundColor() const;
+    void setRubberBackgroundColor(const QBrush & backgroundColor);
 
     QColor shadowColor() const;
     void setShadowColor(const QColor & shadowColor);

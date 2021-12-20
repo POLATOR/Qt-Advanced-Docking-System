@@ -110,6 +110,45 @@ void WindowData::setResizeEnabled(bool enabled)
     }
 }
 
+int WindowData::rubberBorderRadius() const
+{
+    return m_sizeRubberBand->borderRadius();
+}
+
+void WindowData::setRubberBorderRadius(int borderRadius)
+{
+    m_sizeRubberBand->setBorderRadius(borderRadius);
+}
+
+int WindowData::rubberBorderWidth() const
+{
+    return m_sizeRubberBand->borderWidth();
+}
+
+void WindowData::setRubberBorderWidth(int borderWidth)
+{
+    m_sizeRubberBand->setBorderWidth(borderWidth);
+}
+
+QColor WindowData::rubberBorderColor() const
+{
+    return m_sizeRubberBand->borderColor();
+}
+
+void WindowData::setRubberBorderColor(const QColor & borderColor)
+{
+    m_sizeRubberBand->setBorderColor(borderColor);
+}
+
+QBrush WindowData::rubberBackgroundColor() const
+{
+    return m_sizeRubberBand->backgroundColor();
+}
+void WindowData::setRubberBackgroundColor(const QBrush & backgroundColor)
+{
+    m_sizeRubberBand->setBackgroundColor(backgroundColor);
+}
+
 QColor WindowData::shadowColor() const
 {
     return m_shadow->shadowColor();
