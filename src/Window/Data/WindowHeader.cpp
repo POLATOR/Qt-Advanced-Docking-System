@@ -22,21 +22,23 @@ WindowHeader::WindowHeader(WindowData * windowData, QWidget * parent)
     auto mainLayout = new QHBoxLayout;
     mainLayout->addWidget(m_label);
 
-    m_minimize = createButton("MinimizeButton", tr("Minimize"), "icons:Common/Minimize.svg");
+    m_minimize = createButton("MinimizeButton");
     connect(m_minimize, &QToolButton::clicked, m_windowData->sizingWindow(), &QWidget::showMinimized);
     mainLayout->addWidget(m_minimize);
 
-    m_maximize = createButton("MaximizeButton", tr("Maximize"), "icons:Common/Maximize.svg");
+    m_maximize = createButton("MaximizeButton");
     connect(m_maximize, &QToolButton::clicked, this, &WindowHeader::switchMaximized);
     mainLayout->addWidget(m_maximize);
 
-    m_close = createButton("CloseButton", tr("Close"), "icons:Common/Close.svg");
+    m_close = createButton("CloseButton");
     connect(m_close, &QToolButton::clicked, m_windowData->sizingWindow(), &QWidget::close);
     mainLayout->addWidget(m_close);
 
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
+
+    reloadTr();
 }
 
 bool WindowHeader::hasButton(WindowHeaderButton button) const
@@ -97,6 +99,14 @@ void WindowHeader::mouseDoubleClickEvent(QMouseEvent * event)
     }
 }
 
+void WindowHeader::changeEvent(QEvent * event)
+{
+    if (event->type() == QEvent::LanguageChange) {
+        reloadTr();
+    }
+    QFrame::changeEvent(event);
+}
+
 void WindowHeader::mouseMoveEvent(QMouseEvent * event)
 {
     if (m_moveMode) {
@@ -110,7 +120,7 @@ void WindowHeader::mouseMoveEvent(QMouseEvent * event)
                 m_windowData->sizingWindow()->showNormal();
                 m_windowData->showShadow();
                 auto normalSize = m_windowData->sizingWindow()->normalGeometry().size();
-                auto newPos = screenPos - QPoint(normalSize.width() * dw, size().height() / 2) /* + delta*/;
+                auto newPos = screenPos - QPoint(normalSize.width() * dw, size().height() / 2);
                 m_windowData->sizingWindow()->move(newPos);
             }
             else {
@@ -142,15 +152,20 @@ void WindowHeader::mouseReleaseEvent(QMouseEvent * event)
     QFrame::mouseReleaseEvent(event);
 }
 
-QToolButton * WindowHeader::createButton(const QString & name, const QString & tooltip, const QString & iconName)
+QToolButton * WindowHeader::createButton(const QString & name)
 {
     auto button = new QToolButton(this);
     button->setAutoRaise(true);
     button->setFocusPolicy(Qt::NoFocus);
-    button->setIcon(QIcon(iconName));
     button->setObjectName(name);
-    button->setToolTip(tooltip);
     return button;
+}
+
+void WindowHeader::reloadTr()
+{
+    m_minimize->setToolTip(tr("Minimize"));
+    m_maximize->setToolTip(tr("Maximize"));
+    m_close->setToolTip(tr("Close"));
 }
 
 void WindowHeader::switchMaximized()

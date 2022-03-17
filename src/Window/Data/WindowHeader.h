@@ -36,6 +36,8 @@ Q_SIGNALS:
     void endMoving();
 
 protected:
+    void changeEvent(QEvent * event) override;
+
     void mouseDoubleClickEvent(QMouseEvent * event) override;
 
     void mouseMoveEvent(QMouseEvent * event) override;
@@ -54,7 +56,9 @@ private:
     QToolButton * m_maximize = nullptr;
     QToolButton * m_close = nullptr;
 
-    QToolButton * createButton(const QString & name, const QString & tooltip, const QString & iconName);
+    QToolButton * createButton(const QString & name);
+
+    void reloadTr();
 
     void switchMaximized();
 };
