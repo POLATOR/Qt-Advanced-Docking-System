@@ -343,9 +343,9 @@ void CDockAreaTitleBar::onTabsMenuAboutToShow()
 		{
 			continue;
 		}
-		auto Tab = d->TabBar->tab(i);
-		QAction* Action = menu->addAction(Tab->icon(), Tab->text());
-		internal::setToolTip(Action, Tab->toolTip());
+        auto ToggleViewAction = d->TabBar->tab(i)->dockWidget()->toggleViewAction();
+        QAction * Action = menu->addAction(ToggleViewAction->icon(), ToggleViewAction->text());
+        internal::setToolTip(Action, ToggleViewAction->toolTip());
 		Action->setData(i);
 	}
 
