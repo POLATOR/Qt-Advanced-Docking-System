@@ -134,7 +134,7 @@ install(FILES ${ads_HEADERS}
     DESTINATION include/${library_name}
     COMPONENT headers
 )
-install(DIRECTORY Window DESTINATION include/PolatorADS FILES_MATCHING PATTERN "Window.h")
+install(DIRECTORY Window DESTINATION include/${library_name} FILES_MATCHING PATTERN "Window.h")
 
 install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"

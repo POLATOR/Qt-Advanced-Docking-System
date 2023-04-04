@@ -1,20 +1,12 @@
 #pragma once
 
+#include "ads_globals.h"
+
 #include <QGraphicsDropShadowEffect>
 #include <QFlags>
 #include <QWidget>
 
 namespace ads {
-
-Q_NAMESPACE
-
-enum class ShadowStyle
-{
-    None = 0,
-    Single = 1,
-    Triple = 3,
-};
-Q_ENUM_NS(ShadowStyle)
 
 enum class WindowHeaderButton
 {
