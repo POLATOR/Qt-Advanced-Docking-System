@@ -62,6 +62,7 @@
 #include <QPointer>
 #include <QMap>
 #include <QElapsedTimer>
+#include <QQuickWidget>
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
@@ -270,6 +271,10 @@ struct MainWindowPrivate
 		auto ToolBar = DockWidget->createDefaultToolBar();
 		ToolBar->addAction(ui.actionSaveState);
 		ToolBar->addAction(ui.actionRestoreState);
+		// For testing all calendar dock widgets have a the tool button style
+		// Qt::ToolButtonTextUnderIcon
+		DockWidget->setToolBarStyleSource(ads::CDockWidget::ToolBarStyleFromDockWidget);
+		DockWidget->setToolBarStyle(Qt::ToolButtonTextUnderIcon, ads::CDockWidget::StateFloating);
 		return DockWidget;
 	}
 
@@ -407,6 +412,17 @@ struct MainWindowPrivate
 		return DockWidget;
 	}
 
+	/**
+	 * Create QQuickWidget for test for OpenGL and QQuick
+	 */
+	ads::CDockWidget *createQQuickWidget()
+	{
+		QQuickWidget *widget = new QQuickWidget();
+		ads::CDockWidget *dockWidget = new ads::CDockWidget("Quick");
+		dockWidget->setWidget(widget);
+		return dockWidget;
+	}
+
 
 #ifdef Q_OS_WIN
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -424,7 +440,6 @@ struct MainWindowPrivate
 	}
 #endif
 #endif
-
 };
 
 //============================================================================
@@ -437,8 +452,8 @@ void MainWindowPrivate::createContent()
 
 	// For this Special Dock Area we want to avoid dropping on the center of it (i.e. we don't want this widget to be ever tabbified):
 	{
-		SpecialDockArea->setAllowedAreas(ads::OuterDockAreas);
-		//SpecialDockArea->setAllowedAreas({ads::LeftDockWidgetArea, ads::RightDockWidgetArea}); // just for testing
+		//SpecialDockArea->setAllowedAreas(ads::OuterDockAreas);
+		SpecialDockArea->setAllowedAreas({ads::LeftDockWidgetArea, ads::RightDockWidgetArea, ads::TopDockWidgetArea}); // just for testing
 	}
 
 	DockWidget = createLongTextLabelDockWidget();
@@ -506,7 +521,9 @@ void MainWindowPrivate::createContent()
 
 	// Test dock area docking
 	auto RighDockArea = DockManager->addDockWidget(ads::RightDockWidgetArea, createLongTextLabelDockWidget(), TopDockArea);
-	DockManager->addDockWidget(ads::TopDockWidgetArea, createLongTextLabelDockWidget(), RighDockArea);
+	DockWidget = createLongTextLabelDockWidget();
+	DockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, false);
+	DockManager->addDockWidget(ads::TopDockWidgetArea, DockWidget, RighDockArea);
 	auto BottomDockArea = DockManager->addDockWidget(ads::BottomDockWidgetArea, createLongTextLabelDockWidget(), RighDockArea);
 	DockManager->addDockWidget(ads::CenterDockWidgetArea, createLongTextLabelDockWidget(), RighDockArea);
 	auto LabelDockWidget = createLongTextLabelDockWidget();
@@ -514,6 +531,7 @@ void MainWindowPrivate::createContent()
 
 	// Tests CustomCloseHandling without DeleteOnClose
 	LabelDockWidget->setFeature(ads::CDockWidget::CustomCloseHandling, true);
+	LabelDockWidget->setWindowTitle(LabelDockWidget->windowTitle() + " [Custom Close]");
 	QObject::connect(LabelDockWidget, &ads::CDockWidget::closeRequested, [LabelDockWidget, this]()
 	{
 		int Result = QMessageBox::question(_this, "Custom Close Request",
@@ -556,6 +574,11 @@ void MainWindowPrivate::createContent()
 
 	// Create image viewer
 	DockWidget = createImageViewer();
+	DockManager->addDockWidget(ads::LeftDockWidgetArea, DockWidget);
+
+    // Create quick widget
+	DockWidget = createQQuickWidget();
+	DockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 	DockManager->addDockWidget(ads::LeftDockWidgetArea, DockWidget);
 }
 
@@ -734,7 +757,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
     CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
 
 	// uncomment if you would like to enable dock widget auto hiding
-    CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
+    CDockManager::setAutoHideConfigFlags({CDockManager::DefaultAutoHideConfig});
 
 	// uncomment if you would like to enable an equal distribution of the
 	// available size of a splitter to all contained dock widgets
@@ -745,6 +768,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 
 	// Now create the dock manager and its content
 	d->DockManager = new CDockManager(this);
+	d->DockManager->setDockWidgetToolBarStyle(Qt::ToolButtonIconOnly, ads::CDockWidget::StateFloating);
 
  #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	connect(d->PerspectiveComboBox, SIGNAL(activated(QString)),

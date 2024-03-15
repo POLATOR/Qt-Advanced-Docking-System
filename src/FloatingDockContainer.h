@@ -33,7 +33,7 @@
 
 #include <QRubberBand>
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
 #include <QDockWidget>
 #define tFloatingWidgetBase QDockWidget
 #else
@@ -184,10 +184,8 @@ protected: // reimplements QWidget
 
 #ifdef Q_OS_MACOS
 	virtual bool event(QEvent *e) override;
-	virtual void moveEvent(QMoveEvent *event) override;
-#endif
-
-#ifdef Q_OS_LINUX
+    virtual void moveEvent(QMoveEvent *event) override;
+#elif defined(Q_OS_UNIX)
 	virtual void moveEvent(QMoveEvent *event) override;
 	virtual void resizeEvent(QResizeEvent *event) override;
 	virtual bool event(QEvent *e) override;
@@ -272,7 +270,7 @@ public:
 	 */
 	void hideAndDeleteLater();
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
     /**
 	 * This is a function that responds to FloatingWidgetTitleBar::maximizeRequest()
 	 * Maximize or normalize the container size.
@@ -308,7 +306,6 @@ public:
 	 */
 	bool hasNativeTitleBar();
 #endif
-
 }; // class FloatingDockContainer
 }
  // namespace ads

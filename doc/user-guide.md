@@ -27,10 +27,17 @@
   - [`FloatingContainerForceNativeTitleBar` (Linux only)](#floatingcontainerforcenativetitlebar-linux-only)
   - [`FloatingContainerForceQWidgetTitleBar` (Linux only)](#floatingcontainerforceqwidgettitlebar-linux-only)
   - [`MiddleMouseButtonClosesTab`](#middlemousebuttonclosestab)
+  - [`DisableTabTextEliding`](#disabletabtexteliding)
+  - [`ShowTabTextOnlyForActiveTab`](#showtabtextonlyforactivetab)
 - [Auto-Hide Configuration Flags](#auto-hide-configuration-flags)
   - [Auto Hide Dock Widgets](#auto-hide-dock-widgets)
   - [Pinning Auto-Hide Widgets to a certain border](#pinning-auto-hide-widgets-to-a-certain-border)
   - [Show / Hide Auto-Hide Widgets via Mouse Over](#show--hide-auto-hide-widgets-via-mouse-over)
+  - [Drag \& Drop to Auto-Hide](#drag--drop-to-auto-hide)
+  - [Auto-Hide Tab Insertion Order](#auto-hide-tab-insertion-order)
+  - [Auto-Hide Tab Sorting](#auto-hide-tab-sorting)
+  - [Auto-Hide Drag to Float / Dock](#auto-hide-drag-to-float--dock)
+  - [Auto-Hide Context Menu](#auto-hide-context-menu)
   - [Adding Auto Hide Widgets](#adding-auto-hide-widgets)
   - [Setting Auto-Hide Flags](#setting-auto-hide-flags)
   - [`AutoHideFeatureEnabled`](#autohidefeatureenabled)
@@ -39,6 +46,9 @@
   - [`AutoHideButtonCheckable`](#autohidebuttoncheckable)
   - [`AutoHideSideBarsIconOnly`](#autohidesidebarsicononly)
   - [`AutoHideShowOnMouseOver`](#autohideshowonmouseover)
+  - [`AutoHideCloseButtonCollapsesDock`](#autohideclosebuttoncollapsesdock)
+  - [`AutoHideHasCloseButton`](#autohidehasclosebutton)
+  - [`AutoHideHasMinimizeButton`](#autohidehasminimizebutton)
 - [DockWidget Feature Flags](#dockwidget-feature-flags)
   - [`DockWidgetClosable`](#dockwidgetclosable)
   - [`DockWidgetMovable`](#dockwidgetmovable)
@@ -466,6 +476,24 @@ possible in various web browsers.
 
 ![MiddleMouseButtonClosesTab true](cfg_flag_MiddleMouseButtonClosesTab.gif)
 
+### `DisableTabTextEliding`
+
+Set this flag to disable eliding of tab texts in dock area tabs:
+
+![DisableTabTextEliding true](cfg_flag_DisableTabTextEliding_true.png)
+
+The flag is disabled by default and the text in all tabs is elided to show as
+many tabs as possible even if there is not much space:
+
+![DisableTabTextEliding false](cfg_flag_DisableTabTextEliding_false.png)
+
+### `ShowTabTextOnlyForActiveTab`
+
+Set this flag (default = false) to show label texts in dock area tabs only
+for active tabs. Inactive tabs only show their icon:
+
+![MShowTabTextOnlyForActiveTab true](cfg_flag_ShowTabTextOnlyForActiveTab_true.png)
+
 ## Auto-Hide Configuration Flags
 
 ### Auto Hide Dock Widgets
@@ -480,7 +508,7 @@ Enabling this feature adds a button with a pin icon to each dock area.
 ![DockAreaHasAutoHideButton true](cfg_flag_DockAreaHasAutoHideButton.png)
 
 By clicking this button, the current dock widget (or the complete area - depending on the
-configuration flags) will be pinned to a certain border. The border is choosen
+configuration flags) will be pinned to a certain border. The border is chosen
 depending on the location of the dock area. If you click the pin button while
 holding down the **Ctrl** key, the whole dock area will be pinned to a certain
 border.
@@ -501,6 +529,59 @@ the same container. If the Auto-Hide config flag `AutoHideShowOnMouseOver` is se
 the Auto-Hide widget is shown, if the user hovers over the Auto-Hide tab and is
 collapsed if the mouse cursor leaves the Auto-Hide widget. Showing and hiding
 by mouse click still works if this feature is enabled.
+
+### Drag & Drop to Auto-Hide
+
+You can easily drag any dock widget or any floating widget to the
+borders of a window to pin it as a auto-hide tab in one of the 4 sidebars.
+If you drag a dock widget close the one of the four window borders, special
+drop overlays will be shown to indicate the drop area for auto-hide widgets:
+
+![Auo-Hide drag to Sidebar](AutoHide_Drag_to_Sidebar.gif)
+
+Of course, this also works with dock areas:
+
+![Auo-Hide drag Dock Area](AutoHide_Drag_DockArea.gif)
+
+If you drag a dock widget or dock area into a sidebar, then you even have
+control over where tabs are inserted. Simply drag your mouse over a specific
+auto-hide tab, and your dragged dock widget will be inserted before this tab.
+Drag to the sidebar area behind the last tab, and the dragged widget will be
+appended as last tab. In the following screen capture, the **Image Viewer 1** will
+be inserted before the **Table 0** Auto-Hide tab and the **Image Viewer 2**
+is appended behind the last tab:
+
+![Auo-Hide tab insert order](AutoHide_Tab_Insert_Order.gif)
+
+### Auto-Hide Tab Insertion Order
+
+It is also possible to drag Auto-Hide tabs to a new auto-hide position.
+That means, you can drag them to a different border or sidebar:
+
+![Auto-Hide change sidebar](AutoHide_Change_Sidebar.gif)
+
+### Auto-Hide Tab Sorting
+
+You can drag Auto-Hide tabs to a new position in the current sidebar 
+to sort them:
+
+![Auo-Hide sort tabs](AutoHide_Sort_Tabs.gif)
+
+### Auto-Hide Drag to Float / Dock
+
+But that is not all. You can also simply move Auto-Hide tabs to another
+floating widget or dock them via drag and drop:
+
+![Auo-Hide drag to float or dock](AutoHide_Drag_to_Float_or_Dock.gif)
+
+### Auto-Hide Context Menu
+
+All Auto-Hide tabs now have a context menu, that provides all the functionality
+that you know from Dock widget tabs. With the **Pin To...** item from the
+context menu it is very easy to move an Auto-Hide tab to a different Auto-Hide
+sidebar:
+
+![Auo-Hide context menu](AutoHide_Context_Menu.png)
 
 ### Adding Auto Hide Widgets
 
@@ -588,6 +669,39 @@ dock widget in the same container. If this flag is set, the Auto-Hide widget
 is shown, if the user hovers over the Auto-Hide tab or if the users moves the
 mouse outside of the Auto-Hide widget. Showing and hiding my mouse click still
 works if this feature is enabled.
+
+### `AutoHideCloseButtonCollapsesDock`
+
+Some users don't understand the distinction between closing an auto hide dock and
+collapsing an auto hide dock. This may lead to situations where they press the
+close button (losing the side tab widget) instead of simply clicking outside
+the auto hide dock (collapsing the dock). 
+
+![AutoHideCloseButtonCollapsesDock false](cfg_flag_AutoHideCloseButtonCollapsesDock_false.gif)
+
+If `AutoHideCloseButtonCollapsesDock` option is active, the
+close button in an auto hide widget collapses the auto hide widget instead of
+closing it.
+
+![AutoHideCloseButtonCollapsesDock true](cfg_flag_AutoHideCloseButtonCollapsesDock_true.gif)
+
+If you enable the `AutoHideHasMinimizeButton` flag, you should disable this
+flag our you will have two buttons with minimize functionality.
+
+### `AutoHideHasCloseButton`
+
+If this flag is set (default), then each auto hide widget has a close button:
+
+![AutoHideHasCloseButton](cfg_flag_AutoHideHasCloseButton.png)
+
+The functionality of the close button (close or minimize) is configured by the
+`AutoHideCloseButtonCollapsesDock` flag.
+
+### `AutoHideHasMinimizeButton`
+
+If this flag is set (disabled by default), then each auto hide widget has a minimize button.
+
+![AutoHideHasMinimizeButton](cfg_flag_AutoHideHasMinimizeButton.png)
 
 ## DockWidget Feature Flags
 
