@@ -141,7 +141,7 @@ public:
 	CDockContainerWidget* _this;
 	QPointer<CDockManager> DockManager;
 	unsigned int zOrderIndex = 0;
-	QList<CDockAreaWidget*> DockAreas;
+	QList<QPointer<CDockAreaWidget>> DockAreas;
 	QList<CAutoHideDockContainer*> AutoHideWidgets;
 	QMap<SideBarLocation, CAutoHideSideBar*> SideTabBarWidgets;
 	QGridLayout* Layout = nullptr;
@@ -299,7 +299,11 @@ public:
 		VisibleDockAreaCount = 0;
 		for (auto DockArea : DockAreas)
 		{
-			VisibleDockAreaCount += DockArea->isHidden() ? 0 : 1;
+			if (!DockArea)
+			{
+				continue;
+			}
+			VisibleDockAreaCount += (DockArea->isHidden() ? 0 : 1);
 		}
 	}
 
@@ -928,7 +932,10 @@ void DockContainerWidgetPrivate::addDockAreasToList(const QList<CDockAreaWidget*
 //============================================================================
 void DockContainerWidgetPrivate::appendDockAreas(const QList<CDockAreaWidget*> NewDockAreas)
 {
-	DockAreas.append(NewDockAreas);
+	for (auto *newDockArea : NewDockAreas)
+	{
+		DockAreas.append(newDockArea);
+	}
 	for (auto DockArea : NewDockAreas)
 	{
 		QObject::connect(DockArea,
@@ -1641,11 +1648,20 @@ emitAndExit:
 
 
 //============================================================================
+QList<QPointer<CDockAreaWidget>> CDockContainerWidget::removeAllDockAreas()
+{
+	auto Result = d->DockAreas;
+	d->DockAreas.clear();
+	return Result;
+}
+
+
+//============================================================================
 CDockAreaWidget* CDockContainerWidget::dockAreaAt(const QPoint& GlobalPos) const
 {
 	for (const auto& DockArea : d->DockAreas)
 	{
-		if (DockArea->isVisible() && DockArea->rect().contains(DockArea->mapFromGlobal(GlobalPos)))
+		if (DockArea && DockArea->isVisible() && DockArea->rect().contains(DockArea->mapFromGlobal(GlobalPos)))
 		{
 			return DockArea;
 		}
@@ -1682,7 +1698,7 @@ int CDockContainerWidget::visibleDockAreaCount() const
 	int Result = 0;
 	for (auto DockArea : d->DockAreas)
 	{
-		Result += DockArea->isHidden() ? 0 : 1;
+		Result += (!DockArea || DockArea->isHidden()) ? 0 : 1;
 	}
 
 	return Result;
@@ -1753,7 +1769,7 @@ void CDockContainerWidget::dropFloatingWidget(CFloatingDockContainer* FloatingWi
 	if (Dropped)
 	{ 
 		// Fix https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/issues/351
-		FloatingWidget->hideAndDeleteLater();
+		FloatingWidget->finishDropOperation();
 
 		// If we dropped a floating widget with only one single dock widget, then we
 		// drop a top level widget that changes from floating to docked now
@@ -1806,7 +1822,7 @@ QList<CDockAreaWidget*> CDockContainerWidget::openedDockAreas() const
 	QList<CDockAreaWidget*> Result;
 	for (auto DockArea : d->DockAreas)
 	{
-		if (!DockArea->isHidden())
+		if (DockArea && !DockArea->isHidden())
 		{
 			Result.append(DockArea);
 		}
@@ -1822,7 +1838,7 @@ QList<CDockWidget*> CDockContainerWidget::openedDockWidgets() const
 	QList<CDockWidget*> DockWidgetList;
 	for (auto DockArea : d->DockAreas)
 	{
-		if (!DockArea->isHidden())
+		if (DockArea && !DockArea->isHidden())
 		{
 			DockWidgetList.append(DockArea->openedDockWidgets());
 		}
@@ -1837,7 +1853,7 @@ bool CDockContainerWidget::hasOpenDockAreas() const
 {
 	for (auto DockArea : d->DockAreas)
 	{
-		if (!DockArea->isHidden())
+		if (DockArea && !DockArea->isHidden())
 		{
 			return true;
 		}
@@ -2060,8 +2076,12 @@ CDockAreaWidget* CDockContainerWidget::topLevelDockArea() const
 QList<CDockWidget*> CDockContainerWidget::dockWidgets() const
 {
 	QList<CDockWidget*> Result;
-	for (const auto DockArea : d->DockAreas)
+    for (const auto& DockArea : d->DockAreas)
 	{
+		if (!DockArea)
+		{
+			continue;
+		}
 		Result.append(DockArea->dockWidgets());
 	}
 
@@ -2092,8 +2112,12 @@ void CDockContainerWidget::removeAutoHideWidget(CAutoHideDockContainer* Autohide
 CDockWidget::DockWidgetFeatures CDockContainerWidget::features() const
 {
 	CDockWidget::DockWidgetFeatures Features(CDockWidget::AllDockWidgetFeatures);
-	for (const auto DockArea : d->DockAreas)
+    for (const auto& DockArea : d->DockAreas)
 	{
+		if (!DockArea)
+		{
+			continue;
+		}
 		Features &= DockArea->features();
 	}
 
@@ -2111,9 +2135,9 @@ CFloatingDockContainer* CDockContainerWidget::floatingWidget() const
 //============================================================================
 void CDockContainerWidget::closeOtherAreas(CDockAreaWidget* KeepOpenArea)
 {
-	for (const auto DockArea : d->DockAreas)
+    for (const auto& DockArea : d->DockAreas)
 	{
-		if (DockArea == KeepOpenArea)
+		if (!DockArea || DockArea == KeepOpenArea)
 		{
 			continue;
 		}

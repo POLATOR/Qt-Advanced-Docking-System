@@ -159,8 +159,9 @@ Q_ENUMS(SideBarLocation);
 namespace internal {
 static const bool RestoreTesting = true;
 static const bool Restore = false;
-static const char * const ClosedProperty = "close";
-static const char * const DirtyProperty = "dirty";
+static const char* const ClosedProperty = "close";
+static const char* const DirtyProperty = "dirty";
+static const char* const LocationProperty = "Location";
 extern const int FloatingWidgetDragStartEvent;
 extern const int DockedWidgetDragStartEvent;
 
@@ -201,6 +202,7 @@ void replaceSplitterWidget(QSplitter * Splitter, QWidget * From, QWidget * To);
  * that do not have visible content
  */
 void hideEmptyParentSplitters(CDockSplitter * FirstParentSplitter);
+
 
 
 /**

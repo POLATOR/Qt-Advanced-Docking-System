@@ -36,7 +36,7 @@ set(ads_SRCS
     AutoHideTab.cpp
     AutoHideDockContainer.cpp
     PushButton.cpp
-	ResizeHandle.cpp
+    ResizeHandle.cpp
     ads.qrc
 
     Window/Window.cpp
@@ -142,7 +142,7 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 install(FILES ${ads_HEADERS}
-    DESTINATION include/${library_name}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name}
     COMPONENT headers
 )
 install(DIRECTORY Window DESTINATION include/${library_name} FILES_MATCHING PATTERN "Window.h")
@@ -155,25 +155,25 @@ install(FILES
 )
 install(TARGETS ${library_name}
     EXPORT adsTargets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include/${library_name}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name}
 )
 
 install(EXPORT adsTargets
     FILE adsTargets.cmake
     NAMESPACE ads::
-    DESTINATION lib/cmake/${library_name}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name}
 )
 install(FILES qtadvanceddockingConfig.cmake RENAME ${library_name}Config.cmake
-    DESTINATION lib/cmake/${library_name}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name}
 )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${library_name}ConfigVersion.cmake"
-    DESTINATION lib/cmake/${library_name}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name}
 )
 
 target_include_directories(${library_name} PUBLIC
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
