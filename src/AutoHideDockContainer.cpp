@@ -410,11 +410,11 @@ void CAutoHideDockContainer::cleanupAndDelete()
 	const auto dockWidget = d->DockWidget;
 	if (dockWidget)
 	{
-
 		auto SideTab = d->SideTab;
         SideTab->removeFromSideBar();
         SideTab->setParent(nullptr);
         SideTab->hide();
+        dockWidget->setSideTabWidget(nullptr);
 	}
 
 	hide();
