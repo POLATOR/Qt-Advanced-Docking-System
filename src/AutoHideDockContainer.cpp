@@ -414,7 +414,10 @@ void CAutoHideDockContainer::cleanupAndDelete()
         SideTab->removeFromSideBar();
         SideTab->setParent(nullptr);
         SideTab->hide();
-        dockWidget->setSideTabWidget(nullptr);
+        if (dockWidget->sideTabWidget() == SideTab)
+        {
+            dockWidget->setSideTabWidget(nullptr);
+        }
 	}
 
 	hide();
