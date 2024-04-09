@@ -326,7 +326,6 @@ ads--WindowBackground{
 }
 ads--WindowData{
     qproperty-gripSize: 8;
-    qproperty-rubberOnResize: true;
     qproperty-shadowStyle: "None";
     qproperty-shadowColor: #000000;
 }
