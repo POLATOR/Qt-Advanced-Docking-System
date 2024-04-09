@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QKeyEvent>
+#include <QWindow>
 
 #include "DockWidget.h"
 #include "DockAreaWidget.h"
@@ -24,6 +25,13 @@
 #include "DockOverlay.h"
 #include "AutoHideDockContainer.h"
 #include "ads_globals.h"
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#ifdef _MSC_VER
+#pragma comment(lib, "User32.lib")
+#endif
+#endif
 
 namespace ads
 {
@@ -37,7 +45,7 @@ struct FloatingDragPreviewPrivate
 	QWidget* Content;
 	CDockWidget::DockWidgetFeatures ContentFeatures;
 	CDockAreaWidget* ContentSourceArea = nullptr;
-	QPoint DragStartMousePosition;
+	//QPoint DragStartMousePosition;
 	CDockManager* DockManager;
 	CDockContainerWidget *DropContainer = nullptr;
 	qreal WindowOpacity;
@@ -310,12 +318,12 @@ CFloatingDragPreview::CFloatingDragPreview(QWidget* Content, QWidget* parent) :
 		Content->render(&d->ContentPreviewPixmap);
 	}
 
-	connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
-		SLOT(onApplicationStateChanged(Qt::ApplicationState)));
+/*	connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
+		SLOT(onApplicationStateChanged(Qt::ApplicationState)));*/
 
 	// The only safe way to receive escape key presses is to install an event
 	// filter for the application object
-	qApp->installEventFilter(this);
+	//qApp->installEventFilter(this);
 }
 
 
@@ -352,11 +360,11 @@ CFloatingDragPreview::~CFloatingDragPreview()
 //============================================================================
 void CFloatingDragPreview::moveFloating()
 {
-	int BorderSize = (frameSize().width() - size().width()) / 2;
-	const QPoint moveToPos = QCursor::pos() - d->DragStartMousePosition
-	    - QPoint(BorderSize, 0);
-	move(moveToPos);
-	d->updateDropOverlays(QCursor::pos());
+    // int BorderSize = (frameSize().width() - size().width()) / 2;
+    // const QPoint moveToPos = QCursor::pos() - d->DragStartMousePosition
+    //- QPoint(BorderSize, 0);
+    // move(moveToPos);
+    d->updateDropOverlays(QCursor::pos());
 }
 
 
@@ -364,15 +372,20 @@ void CFloatingDragPreview::moveFloating()
 void CFloatingDragPreview::startFloating(const QPoint &DragStartMousePos,
     const QSize &Size, eDragState DragState, QWidget *MouseEventHandler)
 {
-	Q_UNUSED(MouseEventHandler)
-	Q_UNUSED(DragState)
-	resize(Size);
-	d->DragStartMousePosition = DragStartMousePos;
-	moveFloating();
-	show();
+    Q_UNUSED(MouseEventHandler)
+    Q_UNUSED(DragState)
+    resize(Size);
+    // d->DragStartMousePosition = DragStartMousePos;
 
+    int BorderSize = (frameSize().width() - size().width()) / 2;
+    const QPoint moveToPos = QCursor::pos() - DragStartMousePos
+                             - QPoint(BorderSize, 0);
+    move(moveToPos);
+
+    moveFloating();
+    show();
+    windowHandle()->startSystemMove();
 }
-
 
 //============================================================================
 void CFloatingDragPreview::finishDragging()
@@ -451,6 +464,7 @@ void CFloatingDragPreview::cleanupAutoHideContainerWidget(DockWidgetArea Contain
 
 
 //============================================================================
+
 void CFloatingDragPreview::paintEvent(QPaintEvent* event)
 {
 	Q_UNUSED(event);
@@ -513,6 +527,58 @@ bool CFloatingDragPreview::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
+#ifdef Q_OS_WIN
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+bool CFloatingDragPreview::nativeEvent(const QByteArray &eventType, void *message, long *result)
+#else
+bool CFloatingDragPreview::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
+#endif
+{
+	QWidget::nativeEvent(eventType, message, result);
+	MSG *msg = static_cast<MSG*>(message);
+	switch (msg->message)
+	{
+		case WM_MOVING:
+            moveFloating();
+            break;
+
+/*
+        case WM_NCLBUTTONDOWN:
+			 if (msg->wParam == HTCAPTION && d->isState(DraggingInactive))
+			 {
+				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_NCLBUTTONDOWN");
+				d->DragStartPos = pos();
+				d->setState(DraggingMousePressed);
+			 }
+			 break;
+
+		case WM_NCLBUTTONDBLCLK:
+			 d->setState(DraggingInactive);
+			 break;
+
+		case WM_ENTERSIZEMOVE:
+			 if (d->isState(DraggingMousePressed))
+			 {
+				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_ENTERSIZEMOVE");
+				d->setState(DraggingFloatingWidget);
+				d->updateDropOverlays(QCursor::pos());
+			 }
+			 break;
+*/
+		case WM_EXITSIZEMOVE:
+            if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+            {
+                d->cancelDragging();
+            }
+            else
+            {
+                finishDragging();
+            }
+			break;
+	}
+	return false;
+}
+#endif
 
 
 } // namespace ads

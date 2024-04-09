@@ -39,15 +39,16 @@ private Q_SLOTS:
 	void onApplicationStateChanged(Qt::ApplicationState state);
 
 protected:
-	/**
-	 * Cares about painting the
-	 */
-	virtual void paintEvent(QPaintEvent *e) override;
 
-	/**
-	 * The content is a DockArea or a DockWidget
-	 */
-	CFloatingDragPreview(QWidget* Content, QWidget* parent);
+    /**
+     * Cares about painting the
+     */
+    virtual void paintEvent(QPaintEvent* e) override;
+
+    /**
+     * The content is a DockArea or a DockWidget
+     */
+    CFloatingDragPreview(QWidget* Content, QWidget* parent);
 
 public:
 	using Super = QWidget;
@@ -96,6 +97,17 @@ public: // implements IFloatingWidget -----------------------------------------
 	 * Cleanup auto hide container if the dragged widget has one
 	 */
 	void cleanupAutoHideContainerWidget(DockWidgetArea ContainerDropArea);
+
+#ifdef Q_OS_WIN
+	/**
+	 * Native event filter for handling WM_MOVING messages on Windows
+	 */
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+#else
+    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
+#endif
+#endif
 
 Q_SIGNALS:
 	/**

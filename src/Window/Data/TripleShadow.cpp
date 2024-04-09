@@ -5,45 +5,49 @@
 
 #include "Window/Data/TripleShadowPart.h"
 
-namespace ads {
-
-namespace {
-
-TripleShadowPart * CreateTripleShadowPart(TripleShadow * parent, TripleShadowPart::Placement placement, const QColor & shadowColor)
+namespace ads
 {
-    auto shadowPart = new TripleShadowPart(placement, shadowColor, parent);
-    shadowPart->move(TripleShadow::SHADOW_MARGIN_OFFSET);
+
+namespace
+{
+
+constexpr int c_shadowMargin = 96;
+constexpr QSize c_shadowMarginSize{c_shadowMargin * 2, c_shadowMargin * 2};
+constexpr QPoint c_shadowMarginOffset{c_shadowMargin, c_shadowMargin};
+
+TripleShadowPart* CreateTripleShadowPart(TripleShadow* parent,
+                                         TripleShadowPart::Placement placement,
+                                         const QColor& shadowColor)
+{
+    auto* shadowPart = new TripleShadowPart(placement, shadowColor, parent);
+    shadowPart->move(c_shadowMarginOffset);
     shadowPart->setVisible(false);
     return shadowPart;
 }
 
-void SetEffectColor(QWidget * widget, const QColor & shadowColor)
+void SetEffectColor(const QWidget* widget, const QColor& shadowColor)
 {
-    auto effect = qobject_cast<QGraphicsDropShadowEffect *>(widget->graphicsEffect());
-    if (effect) {
+    auto* effect =
+        qobject_cast<QGraphicsDropShadowEffect*>(widget->graphicsEffect());
+    if (effect)
+    {
         effect->setColor(shadowColor);
     }
 }
 
-const int SHADOW_MARGIN = 96;
-const QSize SHADOW_MARGIN_SIZE{SHADOW_MARGIN * 2, SHADOW_MARGIN * 2};
+}  // namespace
 
-} // namespace
-
-const QPoint TripleShadow::SHADOW_MARGIN_OFFSET{SHADOW_MARGIN, SHADOW_MARGIN};
-
-QPoint TripleShadow::mapToShadow(const QPoint & pos)
+QPoint TripleShadow::mapToShadow(const QPoint& pos)
 {
-    return pos - SHADOW_MARGIN_OFFSET;
+    return pos - c_shadowMarginOffset;
 }
 
-QSize TripleShadow::mapToShadow(const QSize & size)
+QSize TripleShadow::mapToShadow(const QSize& size)
 {
-    return size + SHADOW_MARGIN_SIZE;
+    return size + c_shadowMarginSize;
 }
 
-TripleShadow::TripleShadow(QWidget * parent)
-    : QWidget(parent, Qt::Window)
+TripleShadow::TripleShadow(QWidget* parent) : QWidget(parent, Qt::Window)
 {
     setWindowFlag(Qt::FramelessWindowHint);
     setWindowFlag(Qt::X11BypassWindowManagerHint);
@@ -51,14 +55,17 @@ TripleShadow::TripleShadow(QWidget * parent)
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    m_leftPart = CreateTripleShadowPart(this, TripleShadowPart::Placement::Left, m_shadowColor);
-    m_rightPart = CreateTripleShadowPart(this, TripleShadowPart::Placement::Right, m_shadowColor);
-    m_bottomPart = CreateTripleShadowPart(this, TripleShadowPart::Placement::Bottom, m_shadowColor);
+    m_leftPart = CreateTripleShadowPart(this, TripleShadowPart::Placement::Left,
+                                        m_shadowColor);
+    m_rightPart = CreateTripleShadowPart(this, TripleShadowPart::Placement::Right,
+                                         m_shadowColor);
+    m_bottomPart = CreateTripleShadowPart(
+        this, TripleShadowPart::Placement::Bottom, m_shadowColor);
 
-    setVisible(false);
+    hide();
 }
 
-void TripleShadow::setShadowColor(const QColor & shadowColor)
+void TripleShadow::setShadowColor(const QColor& shadowColor)
 {
     SetEffectColor(m_leftPart, shadowColor);
     SetEffectColor(m_rightPart, shadowColor);
@@ -68,10 +75,12 @@ void TripleShadow::setShadowColor(const QColor & shadowColor)
 
 void TripleShadow::setShadowStyle(ShadowStyle shadowStyle)
 {
-    if (shadowStyle == m_shadowStyle) {
+    if (shadowStyle == m_shadowStyle)
+    {
         return;
     }
-    switch (shadowStyle) {
+    switch (shadowStyle)
+    {
     case ShadowStyle::None:
         m_leftPart->hide();
         m_rightPart->hide();
@@ -91,19 +100,20 @@ void TripleShadow::setShadowStyle(ShadowStyle shadowStyle)
     m_shadowStyle = shadowStyle;
 }
 
-void TripleShadow::resizeEvent(QResizeEvent * event)
+void TripleShadow::resizeEvent(QResizeEvent* event)
 {
     resizeParts(event->size());
 }
 
-void TripleShadow::resizeParts(const QSize & newSize)
+void TripleShadow::resizeParts(const QSize& newSize)
 {
-    auto partSize = newSize - SHADOW_MARGIN_SIZE;
-    if (m_leftPart->size() != partSize) {
+    const auto partSize = newSize - c_shadowMarginSize;
+    if (m_leftPart->size() != partSize)
+    {
         m_leftPart->resize(partSize);
         m_rightPart->resize(partSize);
         m_bottomPart->resize(partSize);
     }
 }
 
-} // namespace ads
+}  // namespace ads

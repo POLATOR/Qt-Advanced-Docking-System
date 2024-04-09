@@ -4,7 +4,8 @@
 
 #include "ads_globals.h"
 
-namespace ads {
+namespace ads
+{
 
 class WindowData;
 
@@ -12,21 +13,14 @@ class ADS_EXPORT Window : public QWidget
 {
     Q_OBJECT
 public:
-    Window(QWidget * parent = nullptr);
+    Window(QWidget* parent = nullptr);
 
-    ~Window();
+    ~Window() override;
 
-    QWidget * centralWidget() const;
-
-protected:
-    virtual void onStartMoving();
-
-    virtual void onMoving();
-
-    virtual void onEndMoving();
+    QWidget* centralWidget() const;
 
 private:
-    WindowData * m_data = nullptr;
+    WindowData* m_data = nullptr;
 };
 
-} // namespace ads
+}  // namespace ads

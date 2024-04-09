@@ -37,8 +37,10 @@
 #include <QDockWidget>
 #define tFloatingWidgetBase QDockWidget
 #else
-#include <QWidget>
-#define tFloatingWidgetBase QWidget
+#    include <QWidget>
+
+#    include "Window/Window.h"
+#    define tFloatingWidgetBase Window
 #endif
 
 #include "Window/Window.h"
@@ -103,7 +105,9 @@ public:
  * another dock container.
  * Every floating window of the docking system is a FloatingDockContainer.
  */
-class ADS_EXPORT CFloatingDockContainer : public Window, public IFloatingWidget
+class ADS_EXPORT CFloatingDockContainer :
+    public tFloatingWidgetBase,
+    public IFloatingWidget
 {
 	Q_OBJECT
 private:
@@ -208,13 +212,6 @@ protected: // reimplements QWidget
     virtual bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
 #endif
 #endif
-
-	void onStartMoving() override;
-
-	void onMoving() override;
-
-	void onEndMoving()override;
-
 
 public:
 	using Super = tFloatingWidgetBase;

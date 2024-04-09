@@ -649,9 +649,8 @@ void FloatingDockContainerPrivate::handleEscapeKey()
 
 
 //============================================================================
-CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
-	Window(DockManager),
-	d(new FloatingDockContainerPrivate(this))
+CFloatingDockContainer::CFloatingDockContainer(CDockManager* DockManager)
+    : tFloatingWidgetBase(DockManager), d(new FloatingDockContainerPrivate(this))
 {
 	d->DockManager = DockManager;
 	d->DockContainer = new CDockContainerWidget(DockManager, centralWidget());
@@ -873,7 +872,7 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 		}
 		break;
 
-		case WM_NCLBUTTONDOWN:
+		/*case WM_NCLBUTTONDOWN:
 			 if (msg->wParam == HTCAPTION && d->isState(DraggingInactive))
 			 {
 				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_NCLBUTTONDOWN");
@@ -884,16 +883,17 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 
 		case WM_NCLBUTTONDBLCLK:
 			 d->setState(DraggingInactive);
-			 break;
+			 break;*/
 
 		case WM_ENTERSIZEMOVE:
-			 if (d->isState(DraggingMousePressed))
-			 {
+			//if (d->isState(DraggingMousePressed))
+            if (d->isState(DraggingInactive))
+			{
 				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_ENTERSIZEMOVE");
 				d->setState(DraggingFloatingWidget);
 				d->updateDropOverlays(QCursor::pos());
-			 }
-			 break;
+			}
+			break;
 
 		case WM_EXITSIZEMOVE:
 			 if (d->isState(DraggingFloatingWidget))
@@ -913,34 +913,6 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 	return false;
 }
 #endif
-
-void CFloatingDockContainer::onStartMoving()
-{
-	if (d->isState(DraggingInactive))
-	{
-		d->setState(DraggingFloatingWidget);
-		d->updateDropOverlays(QCursor::pos());
-	}
-}
-
-void CFloatingDockContainer::onMoving()
-{
-	if (d->isState(DraggingFloatingWidget))
-	{
-		d->updateDropOverlays(QCursor::pos());
-	}
-}
-
-void CFloatingDockContainer::onEndMoving()
-{
-	if (d->isState(DraggingFloatingWidget))
-	{
-		ADS_PRINT("CFloatingDockContainer::nativeEvent WM_EXITSIZEMOVE");
-		d->titleMouseReleaseEvent();
-	}
-}
-
-
 
 //============================================================================
 void CFloatingDockContainer::closeEvent(QCloseEvent *event)

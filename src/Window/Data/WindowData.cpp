@@ -1,57 +1,49 @@
 #include "Window/Data/WindowData.h"
 
-#include <functional>
-
 #include <QEvent>
-#include <QGraphicsDropShadowEffect>
 #include <QMoveEvent>
-#include <QScreen>
 #include <QVBoxLayout>
+#include <QWindow>
 
 #include "Window/Data/Resizer.h"
 #include "Window/Data/SizeRubberBand.h"
 #include "Window/Data/TripleShadow.h"
 #include "Window/Data/WindowBackground.h"
-#include "Window/Data/WindowHeader.h"
 
-namespace ads {
+namespace ads
+{
 
-namespace {
-
-} // namespace
-
-const int WindowData::DEFAULT_GRIP_SIZE = 8;
-
-WindowData::WindowData(QWidget * sizingWindow, WindowHeaderButtons buttons)
-    : QWidget(sizingWindow)
-    , m_sizingWindow(sizingWindow)
+WindowData::WindowData(QWidget* sizingWindow, WindowHeaderButtons buttons)
+    : QWidget(sizingWindow), m_sizingWindow(sizingWindow)
 {
     // this widget is a widget only because we need to set it properties from qss
-    // we set its size to zero to hide it because widget must be visible to get properties values from qss
+    // we set its size to zero to hide it because widget must be visible to get
+    // properties values from qss
     setFixedSize(0, 0);
 
     sizingWindow->setWindowFlag(Qt::FramelessWindowHint);
     sizingWindow->setWindowFlag(Qt::X11BypassWindowManagerHint);
-    sizingWindow->setAttribute(Qt::WA_TranslucentBackground);
+    // sizingWindow->setAttribute(Qt::WA_TranslucentBackground);
 
     m_background = new WindowBackground(this, buttons);
 
     m_shadow = new TripleShadow(m_sizingWindow->parentWidget());
-    m_shadow->setGeometry({TripleShadow::mapToShadow(m_sizingWindow->pos()), TripleShadow::mapToShadow(m_sizingWindow->size())});
+    m_shadow->setGeometry({TripleShadow::mapToShadow(m_sizingWindow->pos()),
+                           TripleShadow::mapToShadow(m_sizingWindow->size())});
     m_shadow->stackUnder(m_sizingWindow);
 
-    m_sizeRubberBand = new SizeRubberBand(m_sizingWindow, m_shadow);
+    m_sizeRubberBand = new SizeRubberBand(m_sizingWindow);
 
-    m_resizers.push_back(new NWResizer(m_sizeRubberBand));
-    m_resizers.push_back(new NEResizer(m_sizeRubberBand));
-    m_resizers.push_back(new SWResizer(m_sizeRubberBand));
-    m_resizers.push_back(new SEResizer(m_sizeRubberBand));
-    m_resizers.push_back(new NResizer(m_sizeRubberBand));
-    m_resizers.push_back(new SResizer(m_sizeRubberBand));
-    m_resizers.push_back(new WResizer(m_sizeRubberBand));
-    m_resizers.push_back(new EResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new NWResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new NEResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new SWResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new SEResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new NResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new SResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new WResizer(m_sizeRubberBand));
+    m_resizerList.push_back(new EResizer(m_sizeRubberBand));
 
-    auto mainLayout = new QVBoxLayout;
+    auto* mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_background);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     m_sizingWindow->setLayout(mainLayout);
@@ -66,23 +58,15 @@ WindowData::~WindowData()
     delete m_sizeRubberBand;
 }
 
-bool WindowData::rubberOnResize() const
-{
-    return m_sizeRubberBand->isRubberResize();
-}
-
-void WindowData::setRubberOnResize(bool rubberOnResize)
-{
-    m_sizeRubberBand->setRubberResize(rubberOnResize);
-}
-
 void WindowData::setGripSize(int gripSize)
 {
-    if (gripSize < DEFAULT_GRIP_SIZE) {
+    if (gripSize < c_defaultGripSize)
+    {
         qDebug() << "Grip size too small" << gripSize;
         return;
     }
-    if (gripSize != m_gripSize) {
+    if (gripSize != m_gripSize)
+    {
         m_gripSize = gripSize;
         updateResizers();
     }
@@ -90,53 +74,15 @@ void WindowData::setGripSize(int gripSize)
 
 bool WindowData::isResizeEnabled() const
 {
-    return (!m_resizers.isEmpty() && m_resizers.front()->isVisible());
+    return (!m_resizerList.isEmpty() && m_resizerList.front()->isVisible());
 }
 
 void WindowData::setResizeEnabled(bool enabled)
 {
-    for (auto resizer: m_resizers) {
+    for (auto resizer : m_resizerList)
+    {
         resizer->setVisible(enabled);
     }
-}
-
-int WindowData::rubberBorderRadius() const
-{
-    return m_sizeRubberBand->borderRadius();
-}
-
-void WindowData::setRubberBorderRadius(int borderRadius)
-{
-    m_sizeRubberBand->setBorderRadius(borderRadius);
-}
-
-int WindowData::rubberBorderWidth() const
-{
-    return m_sizeRubberBand->borderWidth();
-}
-
-void WindowData::setRubberBorderWidth(int borderWidth)
-{
-    m_sizeRubberBand->setBorderWidth(borderWidth);
-}
-
-QColor WindowData::rubberBorderColor() const
-{
-    return m_sizeRubberBand->borderColor();
-}
-
-void WindowData::setRubberBorderColor(const QColor & borderColor)
-{
-    m_sizeRubberBand->setBorderColor(borderColor);
-}
-
-QBrush WindowData::rubberBackgroundColor() const
-{
-    return m_sizeRubberBand->backgroundColor();
-}
-void WindowData::setRubberBackgroundColor(const QBrush & backgroundColor)
-{
-    m_sizeRubberBand->setBackgroundColor(backgroundColor);
 }
 
 QColor WindowData::shadowColor() const
@@ -144,7 +90,7 @@ QColor WindowData::shadowColor() const
     return m_shadow->shadowColor();
 }
 
-void WindowData::setShadowColor(const QColor & shadowColor)
+void WindowData::setShadowColor(const QColor& shadowColor)
 {
     m_shadow->setShadowColor(shadowColor);
 }
@@ -157,42 +103,44 @@ ShadowStyle WindowData::shadowStyle() const
 void WindowData::setShadowStyle(ShadowStyle shadowStyle)
 {
     m_shadow->setShadowStyle(shadowStyle);
-    if (m_shadow->shadowStyle() != ShadowStyle::None) {
+    if (m_shadow->shadowStyle() != ShadowStyle::None)
+    {
         m_shadow->setVisible(m_sizingWindow->isVisible());
         m_sizingWindow->raise();
     }
-    else {
+    else
+    {
         m_shadow->hide();
     }
 }
 
-bool WindowData::eventFilter(QObject * watched, QEvent * event)
+bool WindowData::eventFilter(QObject* watched, QEvent* event)
 {
-    if (watched == m_sizingWindow) {
-        switch (event->type()) {
+    if (watched == m_sizingWindow)
+    {
+        switch (event->type())
+        {
         case QEvent::Resize:
             m_shadow->resize(TripleShadow::mapToShadow(m_sizingWindow->size()));
             updateResizers();
             break;
         case QEvent::Move:
-            m_shadow->move(TripleShadow::mapToShadow(static_cast<QMoveEvent *>(event)->pos()));
+            m_shadow->move(TripleShadow::mapToShadow(
+                static_cast<QMoveEvent*>(event)->pos()));
             break;
         case QEvent::Show:
-            if (m_shadow->shadowStyle() != ShadowStyle::None) {
+            if (m_shadow->shadowStyle() != ShadowStyle::None)
+            {
                 m_shadow->show();
                 m_shadow->stackUnder(m_sizingWindow);
             }
             break;
-        case QEvent::Hide:
-            m_shadow->hide();
-            break;
+        case QEvent::Hide: m_shadow->hide(); break;
         case QEvent::ParentChange:
             m_shadow->setParent(m_sizingWindow->parentWidget());
             m_sizingWindow->raise();
             break;
-        case QEvent::WindowStateChange:
-            updateResizers();
-            break;
+        case QEvent::WindowStateChange: updateResizers(); break;
         }
     }
     return QObject::eventFilter(watched, event);
@@ -200,14 +148,16 @@ bool WindowData::eventFilter(QObject * watched, QEvent * event)
 
 void WindowData::hideShadow()
 {
-    if (m_shadow->shadowStyle() != ShadowStyle::None) {
+    if (m_shadow->shadowStyle() != ShadowStyle::None)
+    {
         m_shadow->hide();
     }
 }
 
 void WindowData::showShadow()
 {
-    if (m_shadow->shadowStyle() != ShadowStyle::None) {
+    if (m_shadow->shadowStyle() != ShadowStyle::None)
+    {
         m_shadow->show();
         m_sizingWindow->raise();
     }
@@ -215,15 +165,17 @@ void WindowData::showShadow()
 
 void WindowData::updateResizers()
 {
-    bool visible = !m_sizingWindow->isMinimized();
-    auto & g = m_background->geometry();
-    for (auto resizer: m_resizers) {
+    const bool visible = !m_sizingWindow->isMinimized();
+    auto& g = m_background->geometry();
+    for (auto* resizer : m_resizerList)
+    {
         resizer->setVisible(visible);
-        if (visible) {
+        if (visible)
+        {
             resizer->updateGeometry(g, m_gripSize);
             resizer->raise();
         }
     }
 }
 
-} // namespace ads
+}  // namespace ads
