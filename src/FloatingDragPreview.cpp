@@ -541,38 +541,10 @@ bool CFloatingDragPreview::nativeEvent(const QByteArray &eventType, void *messag
 		case WM_MOVING:
             moveFloating();
             break;
-
-/*
-        case WM_NCLBUTTONDOWN:
-			 if (msg->wParam == HTCAPTION && d->isState(DraggingInactive))
-			 {
-				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_NCLBUTTONDOWN");
-				d->DragStartPos = pos();
-				d->setState(DraggingMousePressed);
-			 }
-			 break;
-
-		case WM_NCLBUTTONDBLCLK:
-			 d->setState(DraggingInactive);
-			 break;
-
-		case WM_ENTERSIZEMOVE:
-			 if (d->isState(DraggingMousePressed))
-			 {
-				ADS_PRINT("CFloatingDockContainer::nativeEvent WM_ENTERSIZEMOVE");
-				d->setState(DraggingFloatingWidget);
-				d->updateDropOverlays(QCursor::pos());
-			 }
-			 break;
-*/
 		case WM_EXITSIZEMOVE:
             if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
             {
                 d->cancelDragging();
-            }
-            else
-            {
-                finishDragging();
             }
 			break;
 	}
